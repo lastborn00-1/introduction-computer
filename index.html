@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Introduction to Computer - Handout by Yahaya Abdulrasheed</title>
 
   <!-- Styles & Fonts -->
@@ -10,84 +10,174 @@
   <link rel="icon" href="/favicon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <!-- SEO & Social -->
-  <meta
-    name="description"
-    content="A comprehensive handout for 100-level students at Kwara State College of Health Technology. Now featuring advanced topics including programming languages, number systems, and Human-Computer Interaction."
-  />
-  <meta
-    property="og:title"
-    content="Introduction to Computer - Handout by Yahaya Abdulrasheed"
-  />
-  <meta
-    property="og:description"
-    content="A comprehensive handout for 100-level students at Kwara State College of Health Technology. Now featuring advanced topics including programming languages, number systems, and Human-Computer Interaction."
-  />
+  <meta name="description" content="A comprehensive handout for 100-level students at Kwara State College of Health Technology. Now featuring advanced topics including programming languages, number systems, and Human-Computer Interaction." />
+  <meta property="og:title" content="Introduction to Computer - Handout by Yahaya Abdulrasheed" />
+  <meta property="og:description" content="A comprehensive handout for 100-level students at Kwara State College of Health Technology. Now featuring advanced topics including programming languages, number systems, and Human-Computer Interaction." />
   <meta property="og:image" content="/og-image.jpg" />
   <meta property="og:url" content="https://vospwgvc.manus.space/" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta
-    name="twitter:title"
-    content="Introduction to Computer - Handout by Yahaya Abdulrasheed"
-  />
-  <meta
-    name="twitter:description"
-    content="A comprehensive handout for 100-level students at Kwara State College of Health Technology. Now featuring advanced topics including programming languages, number systems, and Human-Computer Interaction."
-  />
+  <meta name="twitter:title" content="Introduction to Computer - Handout by Yahaya Abdulrasheed" />
+  <meta name="twitter:description" content="A comprehensive handout for 100-level students at Kwara State College of Health Technology. Now featuring advanced topics including programming languages, number systems, and Human-Computer Interaction." />
   <meta name="twitter:image" content="/og-image.jpg" />
 </head>
 
 <body>
-  <!-- Top buttons (placeholders made functional) -->
-  <div style="text-align:center; margin: 20px;">
-    <a
-      href="handout.pdf"
-      download
-      class="btn btn-primary"
-    >
-      📄 Download Handout (PDF)
-    </a>
-    <a
-      href="handout.pdf"
-      download
-      class="btn btn-secondary"
-    >
-      📥 Get Handout
-    </a>
-  </div>
-
+  <!-- App root (your app/index.js will populate this) -->
   <div id="root"></div>
 
-  <!-- Footer handout download button -->
-  <div style="text-align:center; margin: 20px;">
-    <a
-      href="handout.pdf"
-      download
-      style="display:inline-block; padding:10px 20px; background:#000; color:#fff; border-radius:6px; text-decoration:none; font-weight:600;"
-    >
-      📄 Download Handout (PDF)
-    </a>
-  </div>
-
-  <!-- Your main script -->
+  <!-- your main app script (unchanged) -->
   <script type="module" src="/index.js"></script>
 
-  <!-- Viewport fix -->
+  <!-- viewport CSS variables helper -->
   <script>
     (function () {
       const e = document.documentElement;
       function t() {
-        const t = window.innerWidth,
-          n = window.innerHeight;
-        e.style.setProperty("--vw", `${t / 100}px`),
-        e.style.setProperty("--vh", `${n / 100}px`);
+        const w = window.innerWidth, h = window.innerHeight;
+        e.style.setProperty("--vw", `${w / 100}px`);
+        e.style.setProperty("--vh", `${h / 100}px`);
       }
-      window.addEventListener("resize", t), t();
+      window.addEventListener("resize", t);
+      t();
+    })();
+  </script>
+
+  <!--
+    Handout placeholder fixer
+    - Will convert existing placeholder top buttons/links into downloads of /handout.pdf
+    - Conservative: only targets elements whose visible text or class suggests "download / handout / pdf"
+    - Works for anchors and buttons; observes dynamic additions (created later by index.js)
+  -->
+  <script>
+    (function () {
+      const PDF_PATH = "handout.pdf"; // relative path; ensure handout.pdf is in the same folder
+
+      // Quick, safe text-match for candidate elements
+      function looksLikeHandoutCandidate(el) {
+        if (!el || !(el instanceof HTMLElement)) return false;
+
+        // Already points to a real PDF -> nothing to do
+        if (el.tagName === 'A') {
+          const href = (el.getAttribute('href') || '').trim().toLowerCase();
+          if (href.endsWith('.pdf')) return false;
+        }
+
+        const text = ((el.innerText || el.textContent) + "").trim().toLowerCase();
+        const classStr = (Array.from(el.classList || []).join(' ') || "").toLowerCase();
+
+        // Basic keywords to detect placeholders
+        const keywords = ['download', 'handout', 'pdf', 'get handout', 'get pdf', 'download handout', 'download pdf', 'get material'];
+        for (const k of keywords) {
+          if (text.includes(k) || classStr.includes(k)) return true;
+        }
+
+        // Anchors that are clearly placeholders (href="#" or "javascript:void(0)" or empty)
+        if (el.tagName === 'A') {
+          const href = (el.getAttribute('href') || '').trim().toLowerCase();
+          if (!href || href === '#' || href === '#!' || href.startsWith('javascript:void')) return true;
+        }
+
+        // data-* attributes that might indicate placeholder intent
+        for (const attr of el.attributes || []) {
+          if (attr.name.startsWith('data-')) {
+            const v = (attr.value || "").toLowerCase();
+            if (v.includes('download') || v.includes('handout') || v.includes('.pdf')) return true;
+          }
+        }
+
+        return false;
+      }
+
+      // Attach download behavior without changing visual element type
+      function attachDownloadBehavior(el) {
+        if (!el || !(el instanceof HTMLElement)) return;
+        if (el._handoutDownloadBound) return; // avoid double-binding
+        el._handoutDownloadBound = true;
+
+        if (el.tagName === 'A') {
+          try {
+            el.setAttribute('href', PDF_PATH);
+            el.setAttribute('download', '');
+            el.setAttribute('rel', 'noopener');
+          } catch (err) {
+            // ignore
+          }
+        } else {
+          el.addEventListener('click', function (e) {
+            // prevent any existing default navigation that might interfere
+            try { e.preventDefault(); } catch (err) {}
+            // create an invisible anchor and click it to trigger download
+            const a = document.createElement('a');
+            a.href = PDF_PATH;
+            a.setAttribute('download', 'handout.pdf');
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            // For some browsers, a target might be needed; keep same-origin so download attribute should work
+            a.click();
+            a.remove();
+          }, { passive: false });
+        }
+      }
+
+      // Scan a root node for candidate elements and attach behavior
+      function scanRoot(root) {
+        if (!root || !(root.querySelectorAll)) return;
+        // check likely interactive elements only for speed
+        const candidates = root.querySelectorAll('a, button, [role="button"], .btn, .download, .handout, [data-download]');
+        candidates.forEach(el => {
+          if (looksLikeHandoutCandidate(el)) attachDownloadBehavior(el);
+        });
+
+        // Fallback broader scan if top-two buttons are not in common classes: search text nodes
+        // (This is conservative and only runs if we didn't find any matches above)
+        const found = Array.from(candidates).some(el => el._handoutDownloadBound);
+        if (!found) {
+          // look for visible elements whose text looks like download keywords
+          const all = root.querySelectorAll('a, button, span, div');
+          for (const el of all) {
+            if (looksLikeHandoutCandidate(el)) attachDownloadBehavior(el);
+          }
+        }
+      }
+
+      // Observe for dynamic content (index.js or other scripts may create the top buttons after load)
+      const observer = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+          if (m.addedNodes && m.addedNodes.length) {
+            m.addedNodes.forEach(node => {
+              if (node instanceof HTMLElement) {
+                // check the added node and its descendants
+                if (looksLikeHandoutCandidate(node)) attachDownloadBehavior(node);
+                scanRoot(node);
+              }
+            });
+          }
+        }
+      });
+
+      function start() {
+        // initial scan
+        scanRoot(document);
+
+        // start observing body for dynamic additions
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        // expose for debugging if needed (safe to leave)
+        window.__handoutDownloadFixer = {
+          PDF_PATH,
+          stop: () => observer.disconnect()
+        };
+        console.info('[Handout Fixer] active — linking download placeholders to', PDF_PATH);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', start);
+      } else {
+        start();
+      }
     })();
   </script>
 </body>
